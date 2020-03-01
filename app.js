@@ -4,6 +4,7 @@ const _ = require("lodash");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const routes = require("./routes");
+const savePost = require("./routes/post").savePost;
 const port = process.env.PORT || 3001;
 
 mongoose.connect(
@@ -44,5 +45,8 @@ io.on("connection", socket => {
     for (let room in rooms) socket.leave(room);
     delete rooms;
     socket.join(channel_id);
+  });
+  socket.on("new_post", post_obj => {
+    io.to(post_obj.channel_id).emit("new_post_braodcast", post_obj);
   });
 });

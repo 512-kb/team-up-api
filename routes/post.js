@@ -45,4 +45,28 @@ router
     });
   });
 
+module.exports.savePost = async post_object => {
+  let res = {};
+  await new Post(_.assign(post_object, { created: Date.now() }))
+    .save()
+    .then(async post_obj => {
+      await Invitation.updateOne(
+        { channel_id: post_object.channel_id, username: post_object.username },
+        {
+          $inc: { post_count: 1 }
+        }
+      )
+        .then(() => {
+          res = { msg: "Post created", post: post_obj };
+        })
+        .catch(err => {
+          if (err) res = err;
+        });
+    })
+    .catch(err => {
+      if (err) res = err;
+    });
+  return res;
+};
+
 module.exports = router;

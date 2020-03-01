@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const bodyParser = require("body-parser");
 const _ = require("lodash");
+const User = require("../schema").User;
 const Channel = require("../schema").Channel;
 const Invitation = require("../schema").Invitation;
 
@@ -76,10 +77,19 @@ router
   })
   .post(async (req, res) => {
     //{channel_id,channel_name,username,sent_by}
+    if (req.body.username === req.body.sent_by) {
+      res.send({ err: "Can't Invite Yourself!" });
+      return;
+    }
+    let usr = await User.findOne({ username: req.body.username });
+    if (!usr) {
+      res.send({ err: "No such user" });
+      return;
+    }
     let invite = await Invitation.findOne(req.body);
     if (invite) {
-      if (invite.status) res.send({ msg: "Already a member" });
-      else res.send({ msg: "Invite already Sent" });
+      if (invite.status) res.send({ err: "Already a member" });
+      else res.send({ err: "Invite already Sent" });
       return;
     }
     invite = new Invitation(
@@ -91,7 +101,7 @@ router
       .catch(err => {
         if (err) {
           console.log(err);
-          res.send({ msg: "Error Occured" });
+          res.send({ err: "Error Occured" });
         }
       });
   })

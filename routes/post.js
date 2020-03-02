@@ -9,12 +9,16 @@ router.use(bodyParser.json());
 router
   .route("/posts")
   .get(async (req, res) => {
-    //{username,channel_id}
+    //{username,pgno,channel_id}
     if (!req.query.username || !req.query.channel_id) {
       res.send([]);
       return;
     }
-    const posts = await Post.find(req.query).sort({ created: 1 });
+    const posts = await Post.find({ channel_id: req.query.channel_id })
+      .sort({ created: -1 })
+      .skip(req.query.page * 30)
+      .limit(30)
+      .sort({ created: 1 });
     res.send(posts);
   })
   .post(async (req, res) => {
@@ -44,6 +48,17 @@ router
       else res.send({ msg: "Post Deleted" });
     });
   });
+
+module.exports.getPosts = async query => {
+  let res = [];
+
+  res = await Post.find(_.omit(query, "page"))
+    .sort({ created: -1 })
+    .skip(query.page * 30)
+    .limit(30)
+    .sort({ created: 1 });
+  return res;
+};
 
 module.exports.savePost = async post_object => {
   let res = {};

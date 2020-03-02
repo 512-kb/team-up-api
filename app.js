@@ -46,11 +46,25 @@ io.on("connection", socket => {
     let rooms = _.omit(io.sockets.adapter.sids[socket.id], socket.id);
     for (let room in rooms) socket.leave(room);
     delete rooms;
-    if (!q.channel_id) q.channel_id = [];
+    if (!q[channel_id]) q[channel_id] = { posts: [], isOccupied: false };
     socket.join(channel_id);
   });
   socket.on("new_post", post_obj => {
-    post_obj.created = Date.now();
-    io.to(post_obj.channel_id).emit("new_post_braodcast", post_obj);
+    q[post_obj.channel_id].posts.push(post_obj);
+    setTimeout(async () => {
+      let wait_for_q = setInterval(() => {
+        if (!q[post_obj.channel_id].isOccupied) clearInterval(wait_for_q);
+      }, 400);
+      q[post_obj.channel_id].isOccupied = true;
+      while (q[post_obj.channel_id].posts.length) {
+        const res = await savePost(q[post_obj.channel_id].posts.shift());
+        io.to(post_obj.channel_id).emit("new_post_braodcast", res.post);
+        // io.to(post_obj.channel_id).emit(
+        //   "new_post_braodcast",
+        //   q[post_obj.channel_id].posts.shift()
+        // );
+      }
+      q[post_obj.channel_id].isOccupied = false;
+    }, 400);
   });
 });

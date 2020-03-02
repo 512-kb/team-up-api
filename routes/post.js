@@ -69,4 +69,4 @@ module.exports.savePost = async post_object => {
   return res;
 };
 
-module.exports = router;
+module.exports.router = router;

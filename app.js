@@ -39,14 +39,18 @@ const io = require("socket.io")(
   app.listen(port, () => console.log("Server listening on port " + port))
 );
 
+let q = {};
+
 io.on("connection", socket => {
   socket.on("join_channel_room", channel_id => {
     let rooms = _.omit(io.sockets.adapter.sids[socket.id], socket.id);
     for (let room in rooms) socket.leave(room);
     delete rooms;
+    if (!q.channel_id) q.channel_id = [];
     socket.join(channel_id);
   });
   socket.on("new_post", post_obj => {
+    post_obj.created = Date.now();
     io.to(post_obj.channel_id).emit("new_post_braodcast", post_obj);
   });
 });

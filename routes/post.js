@@ -6,21 +6,20 @@ const Invitation = require("../schema").Invitation;
 
 // router.use(bodyParser.json());
 
-// router
-//   .route("/posts")
-//   .get(async (req, res) => {
-//     //{username,pgno,channel_id}
-//     if (!req.query.username || !req.query.channel_id) {
-//       res.send([]);
-//       return;
-//     }
-//     const posts = await Post.find({ channel_id: req.query.channel_id })
-//       .sort({ created: -1 })
-//       .skip(req.query.page * 30)
-//       .limit(30)
-//       .sort({ created: 1 });
-//     res.send(posts);
-//   })
+// router.route("/posts").get(async (req, res) => {
+//   //{username,pgno,channel_id}
+//   if (!req.query.username || !req.query.channel_id) {
+//     res.send([]);
+//     return;
+//   }
+//   const posts = await Post.find(_.omit({ channel_id: req.query.channel_id },"page"))
+//     .sort({
+//       created: -1
+//     })
+//     .skip(req.query.page * 20)
+//     .limit(20);
+//   res.send(posts.reverse());
+// });
 //   .post(async (req, res) => {
 //     //{username,tags[],content,channel_id}
 //     await new Post(_.assign(req.body, { created: Date.now() }))
@@ -54,10 +53,9 @@ module.exports.getPosts = async query => {
 
   res = await Post.find(_.omit(query, "page"))
     .sort({ created: -1 })
-    .skip(query.page * 30)
-    .limit(30)
-    .sort({ created: 1 });
-  return res;
+    .skip(query.page * 20)
+    .limit(20);
+  return res.reverse();
 };
 
 module.exports.savePost = async post_object => {

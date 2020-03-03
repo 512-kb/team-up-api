@@ -53,11 +53,15 @@ io.on("connection", socket => {
     let rooms = _.omit(io.sockets.adapter.sids[socket.id], socket.id);
     for (let room in rooms) socket.leave(room);
     delete rooms;
+
     if (!q[channel_id]) q[channel_id] = { posts: [], isOccupied: false };
+
     waitForQueue(channel_id);
+
     q[channel_id].isOccupied = true;
     let res = await getPosts({ channel_id, page: 0 });
     q[channel_id].isOccupied = false;
+
     updateClientPosts(res);
     delete res;
     socket.join(channel_id);
@@ -84,7 +88,7 @@ io.on("connection", socket => {
     q[query.channel_id].isOccupied = true;
     let res = await getPosts(query);
     q[query.channel_id].isOccupied = false;
-    updateClientPosts(res);
+    if (res.length > 0) updateClientPosts(res);
     delete res;
   });
 });

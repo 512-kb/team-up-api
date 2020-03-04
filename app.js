@@ -59,10 +59,10 @@ io.on("connection", socket => {
     waitForQueue(channel_id);
 
     q[channel_id].isOccupied = true;
-    let res = await getPosts({ channel_id, page: 0 });
+    let res = await getPosts({ channel_id, skip: 0 });
     q[channel_id].isOccupied = false;
 
-    updateClientPosts(res);
+    if (res.length > 0) updateClientPosts(res);
     delete res;
     socket.join(channel_id);
   });

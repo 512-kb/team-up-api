@@ -5,10 +5,10 @@ const Invitation = require("../schema").Invitation;
 module.exports.getPosts = async query => {
   let res = [];
 
-  res = await Post.find(_.omit(query, "page"))
+  res = await Post.find({ channel_id: query.channel_id })
     .sort({ created: -1 })
-    .skip(query.page * 20)
-    .limit(20);
+    .skip(query.skip)
+    .limit(10);
   return res.reverse();
 };
 

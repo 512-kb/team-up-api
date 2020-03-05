@@ -77,7 +77,7 @@ io.on("connection", socket => {
         const res = await savePost(q[post_obj.channel_id].posts.shift());
         io.to(post_obj.channel_id).emit("new_post_braodcast", res.post);
         delete res;
-        //io.to(post_obj.channel_id).emit( "new_post_braodcast",   q[post_obj.channel_id].posts.shift() );
+        //io.to(post_obj.channel_id).emit( 
       }
       q[post_obj.channel_id].isOccupied = false;
     }, 400);

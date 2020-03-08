@@ -11,6 +11,7 @@ router.get("/top5", async (req, res) => {
   switch (req.query.entity) {
     case "channels":
       let channels = await Post.aggregate([
+        { $match: JSON.parse(req.query.filter) },
         {
           $sortByCount: "$channel_id"
         }
@@ -25,19 +26,22 @@ router.get("/top5", async (req, res) => {
       res.send(channels);
       return;
     case "regions":
-      const regions = await User.aggregate([{ $sortByCount: "$region" }]).limit(
-        5
-      );
+      const regions = await User.aggregate([
+        { $match: JSON.parse(req.query.filter) },
+        { $sortByCount: "$region" }
+      ]).limit(5);
       res.send(regions);
       return;
     case "users":
-      const users = await Post.aggregate([{ $sortByCount: "$username" }]).limit(
-        5
-      );
+      const users = await Post.aggregate([
+        { $match: JSON.parse(req.query.filter) },
+        { $sortByCount: "$username" }
+      ]).limit(5);
       res.send(users);
       return;
     case "tags":
       let tags = await Post.aggregate([
+        { $match: JSON.parse(req.query.filter) },
         { $unwind: "$tags" },
         {
           $group: {

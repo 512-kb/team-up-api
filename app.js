@@ -1,5 +1,4 @@
 const app = require("express")();
-const admin = require("os").userInfo().username;
 const _ = require("lodash");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -9,9 +8,7 @@ const savePost = require("./routes/post").savePost;
 const port = process.env.PORT || 3001;
 
 mongoose.connect(
-  admin === "kb98k" || admin === "kunal"
-    ? "mongodb://localhost:27017/team-up"
-    : "mongodb+srv://512kb:n%2D%25%23Q%2BH%2BEk%25W.y6@mongo-cluster-o7hzs.mongodb.net/team-up",
+  "mongodb+srv://512kb:n%2D%25%23Q%2BH%2BEk%25W.y6@mongo-cluster-o7hzs.mongodb.net/team-up",
   {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -21,7 +18,7 @@ mongoose.connection
   .once("open", () => {
     console.log("Connected to MongoDB");
   })
-  .on("error", err => {
+  .on("error", (err) => {
     console.log(err);
   });
 
@@ -42,13 +39,13 @@ const io = require("socket.io")(
 
 let q = {};
 
-const waitForQueue = id => {
+const waitForQueue = (id) => {
   let wait_for_q = setInterval(() => {
     if (!q[id].isOccupied) clearInterval(wait_for_q);
   }, 400);
 };
 
-io.on("connection", socket => {
+io.on("connection", (socket) => {
   socket.on("join_channel_room", async (channel_id, updateClientPosts) => {
     let rooms = _.omit(io.sockets.adapter.sids[socket.id], socket.id);
     for (let room in rooms) socket.leave(room);
@@ -67,7 +64,7 @@ io.on("connection", socket => {
     socket.join(channel_id);
   });
 
-  socket.on("new_post", post_obj => {
+  socket.on("new_post", (post_obj) => {
     q[post_obj.channel_id].posts.push(post_obj);
     setTimeout(async () => {
       waitForQueue(post_obj.channel_id);

@@ -1,7 +1,10 @@
 const router = require("express").Router();
+const fs = require("fs");
 
-router.use(require("./user_auth"));
-router.use(require("./channel"));
-router.use(require("./top5"));
-
+fs.readdirSync("./routes").forEach(
+  (file) =>
+    file !== "index.js" &&
+    file !== "post.js" &&
+    router.use(require(`./${file}`))
+);
 module.exports = router;

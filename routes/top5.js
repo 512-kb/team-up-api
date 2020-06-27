@@ -1,11 +1,8 @@
 const router = require("express").Router();
-const bodyParser = require("body-parser");
 const _ = require("lodash");
 const User = require("../schema").User;
 const Post = require("../schema").Post;
 const Channel = require("../schema").Channel;
-
-router.use(bodyParser.json());
 
 router.get("/top5", async (req, res) => {
   switch (req.query.entity) {

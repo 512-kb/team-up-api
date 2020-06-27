@@ -1,11 +1,8 @@
 const router = require("express").Router();
-const bodyParser = require("body-parser");
 const _ = require("lodash");
 const User = require("../schema").User;
 const Channel = require("../schema").Channel;
 const Invitation = require("../schema").Invitation;
-
-router.use(bodyParser.json());
 
 router
   .route("/channels")
@@ -39,7 +36,7 @@ router
     channel = new Channel(_.assign(req.body, { created: Date.now() }));
     await channel
       .save()
-      .then(async channel_obj => {
+      .then(async (channel_obj) => {
         const invite = new Invitation({
           username: channel_obj.username,
           sent_by: channel_obj.username,
@@ -51,14 +48,14 @@ router
         await invite
           .save()
           .then(() => res.send({ msg: "Channel created" }))
-          .catch(err => {
+          .catch((err) => {
             if (err) {
               console.log(err);
               res.send({ msg: "Error Occured" });
             }
           });
       })
-      .catch(err => {
+      .catch((err) => {
         if (err) {
           console.log(err);
           res.send({ msg: "Error Occured" });
@@ -98,7 +95,7 @@ router
     await invite
       .save()
       .then(() => res.send({ msg: "Invite Sent" }))
-      .catch(err => {
+      .catch((err) => {
         if (err) {
           console.log(err);
           res.send({ err: "Error Occured" });
@@ -114,7 +111,7 @@ router
           status: true
         }
       },
-      err => {
+      (err) => {
         if (err) res.send(err);
         else res.send({ msg: "Invitation Accepted" });
       }
@@ -122,7 +119,7 @@ router
   })
   .delete(async (req, res) => {
     //{channel_id,username}
-    await Invitation.deleteOne(req.query, err => {
+    await Invitation.deleteOne(req.query, (err) => {
       if (err) res.send({ msg: "Some error occured" });
       else res.send({ msg: "Invitation Declined" });
     });

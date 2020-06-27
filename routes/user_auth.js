@@ -1,9 +1,6 @@
 const router = require("express").Router();
-const bodyParser = require("body-parser");
 const _ = require("lodash");
 const User = require("../schema").User;
-
-router.use(bodyParser.json());
 
 router.get("/login", async (req, res) => {
   let user = await User.find(req.query, (err) => {

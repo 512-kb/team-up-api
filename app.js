@@ -1,19 +1,20 @@
-const app = require("express")();
+require("dotenv").config();
+const express = require("express");
+const app = express();
 const _ = require("lodash");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const routes = require("./routes");
 const getPosts = require("./routes/post").getPosts;
 const savePost = require("./routes/post").savePost;
-const port = process.env.PORT || 3001;
+const port = process.env.PORT;
 
-mongoose.connect(
-  "mongodb+srv://512kb:n%2D%25%23Q%2BH%2BEk%25W.y6@mongo-cluster-o7hzs.mongodb.net/team-up",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  }
-);
+app.use(express.json());
+
+mongoose.connect(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 mongoose.connection
   .once("open", () => {
     console.log("Connected to MongoDB");

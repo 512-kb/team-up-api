@@ -2,28 +2,34 @@ const router = require("express").Router();
 const _ = require("lodash");
 const User = require("../schema").User;
 
-router.get("/login", async (req, res) => {
-  let user = await User.find(req.query, (err) => {
-    if (err) res.send({ msg: "Invalid Credentials" });
-  });
-  if (user.length <= 0) res.send({ msg: "Invalid Credentials" });
-  else
-    res.send({
-      _id: user[0]._id,
-      username: user[0].username,
-      region: user[0].region
+router.get(
+  "/login",
+  /*(req, res, next) => {
+    console.log(req._parsedUrl.pathname);
+    next();
+  },*/
+  async (req, res) => {
+    let user = await User.find(req.query, (err) => {
+      if (err) res.send({ msg: "Invalid Credentials" });
     });
-});
+    if (user.length <= 0) res.send({ msg: "Invalid Credentials" });
+    else
+      res.send({
+        _id: user[0]._id,
+        username: user[0].username,
+        region: user[0].region
+      });
+  }
+);
 
-router.get("/validate", async ({ query }, res) => {
+router.get("/validate", async ({ query: { username, email } }, res) => {
   let [user] = await User.find({
-    $or: [{ username: query.username }, { email: query.email }]
+    $or: [{ username }, { email }]
   });
   let obj = {};
   if (user) {
-    if (user.email === query.email) obj.email = "E-mail already registered";
-    if (user.username === query.username)
-      obj.username = "Username already taken";
+    if (user.email === email) obj.email = "E-mail already registered";
+    if (user.username === username) obj.username = "Username already taken";
   }
   res.send(obj);
 });

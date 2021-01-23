@@ -17,14 +17,14 @@ router.get(
       res.send({
         _id: user[0]._id,
         username: user[0].username,
-        region: user[0].region
+        region: user[0].region,
       });
   }
 );
 
 router.get("/validate", async ({ query: { username, email } }, res) => {
   let [user] = await User.find({
-    $or: [{ username }, { email }]
+    $or: [{ username }, { email }],
   });
   let obj = {};
   if (user) {
@@ -36,7 +36,7 @@ router.get("/validate", async ({ query: { username, email } }, res) => {
 
 router.post("/register", async ({ body }, res) => {
   let [user] = await User.find({
-    $or: [{ username: body.username }, { email: body.email }]
+    $or: [{ username: body.username }, { email: body.email }],
   });
   if (user) {
     let obj = {};
@@ -50,6 +50,11 @@ router.post("/register", async ({ body }, res) => {
   await user.save().then(({ _id, username, region }) => {
     res.send({ _id, username, region });
   });
+});
+
+router.post("/test", async (req, res) => {
+  console.log(req.body);
+  res.send(`ok`);
 });
 
 module.exports = router;
